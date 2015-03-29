@@ -1,4 +1,4 @@
-package com.namvo.shakeutilitylibrary.trigger;
+package com.namvo.shakeutilitylibrary;
 
 import android.content.Context;
 

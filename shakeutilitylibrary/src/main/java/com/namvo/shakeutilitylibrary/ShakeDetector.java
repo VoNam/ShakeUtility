@@ -1,4 +1,4 @@
-package com.namvo.shakeutilitylibrary.detector;
+package com.namvo.shakeutilitylibrary;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -7,48 +7,35 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.FloatMath;
 
-import com.namvo.shakeutilitylibrary.trigger.AbstractTrigger;
-
 /**
  * Created by namvo on 3/28/15.
  */
-public class ShakeDetector implements SensorEventListener {
-    /*
-     * The gForce that is necessary to register as shake.
-     * Must be greater than 1G (one earth gravity unit).
-     * You can install "G-Force", by Blake La Pierre
-     * from the Google Play Store and run it to see how
-     *  many G's it takes to register a shake
-     */
+class ShakeDetector implements SensorEventListener {
     private static final float SHAKE_THRESHOLD_GRAVITY = 2.7F;
     private static final int SHAKE_SLOP_TIME_MS = 500;
 
-    private static AbstractTrigger mListener;
+    private static AbstractTrigger mAbstractTrigger;
     private long mShakeTimestamp;
     private static Context mContext;
     private static SensorManager mSensorManager;
     private static Sensor mAccelerometer;
     private final static ShakeDetector mInstance = new ShakeDetector();
 
-    public static void startShakeDetector(Context context, AbstractTrigger trigger) {
+    public static void start(Context context, AbstractTrigger trigger) {
         mContext = context;
         mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mListener = trigger;
+        mAbstractTrigger = trigger;
         mSensorManager.registerListener(mInstance, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
     }
 
-    public static void stopShakeDetector() {
+    public static void stop() {
         mSensorManager.unregisterListener(mInstance);
-    }
-
-    public interface OnShakeListener {
-        public void onShake(int count);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (mListener != null) {
+        if (mAbstractTrigger != null) {
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
@@ -69,7 +56,7 @@ public class ShakeDetector implements SensorEventListener {
 
                 mShakeTimestamp = now;
 
-                mListener.onTriggerListener(mContext);
+                mAbstractTrigger.onTriggerListener(mContext);
             }
         }
     }
